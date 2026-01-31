@@ -8,24 +8,28 @@
         font-family: Arial, sans-serif;
         display: flex;
         justify-content: center;
-        padding-top: 50px;
+        padding: 20px;
         background: #f0f2f5;
+        box-sizing: border-box;
     }
     .container {
         background: #fff;
-        padding: 30px;
+        padding: 20px;
         border-radius: 10px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        width: 400px;
+        width: 100%;
+        max-width: 500px;
         text-align: center;
     }
     input[type="text"] {
-        width: 70%;
+        width: 90%;
+        max-width: 400px;
         padding: 10px;
         margin-bottom: 15px;
         border-radius: 5px;
         border: 1px solid #ccc;
         font-size: 16px;
+        box-sizing: border-box;
     }
     button {
         padding: 10px 18px;
@@ -36,6 +40,8 @@
         font-size: 16px;
         cursor: pointer;
         margin-bottom: 20px;
+        width: 90%;
+        max-width: 200px;
     }
     button:hover {
         background: #0056b3;
@@ -47,6 +53,7 @@
         margin-bottom: 15px;
         text-align: left;
         background: #f9f9f9;
+        word-wrap: break-word;
     }
     .entry p {
         margin: 5px 0;
@@ -59,8 +66,10 @@
         font-weight: bold;
         color: #007bff;
         display: flex;
+        flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
+        gap: 10px;
     }
     .whatsapp-btn {
         background-color: #25D366;
@@ -70,9 +79,24 @@
         text-decoration: none;
         font-weight: bold;
         font-size: 14px;
+        text-align: center;
     }
     .whatsapp-btn:hover {
         background-color: #1DA851;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+        .container {
+            padding: 15px;
+        }
+        input[type="text"], button {
+            width: 100%;
+        }
+        .contact {
+            flex-direction: column;
+            align-items: flex-start;
+        }
     }
 </style>
 </head>
@@ -100,7 +124,7 @@ async function searchOrder() {
 
     if (!orderId) return alert("Zəhmət olmasa sifariş nömrəsini daxil edin.");
 
-    const url = 'https://raw.githubusercontent.com/rewaranty/rhwaranty/refs/heads/main/files/warranty.json'; // Replace with your JSON URL
+    const url = 'https://raw.githubusercontent.com/rewaranty/rhwaranty/refs/heads/main/files/warranty.json';
 
     try {
         const response = await fetch(url);
@@ -114,7 +138,6 @@ async function searchOrder() {
             return;
         }
 
-        // Show vertical entries with contact and WhatsApp button
         let html = '';
         matches.forEach(item => {
             html += `<div class="entry">
@@ -131,7 +154,6 @@ async function searchOrder() {
         });
         resultDiv.innerHTML = html;
 
-        // Draw PNG (hidden, without clickable WhatsApp button)
         drawPNG(matches);
         downloadBtn.style.display = 'inline-block';
 
@@ -151,13 +173,11 @@ function drawPNG(entries) {
     canvas.width = width;
     canvas.height = height;
 
-    // Background
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0,0,width,height);
 
     let y = padding;
     entries.forEach(item => {
-        // Background box for each entry
         ctx.fillStyle = '#f9f9f9';
         ctx.fillRect(padding-5, y-5, width-padding*2+10, lineHeight*5 + contactHeight + 10);
 
@@ -174,7 +194,6 @@ function drawPNG(entries) {
         ctx.fillText(`Zəmanətin bitmə tarixi: ${item.warranty_end_date}`, padding, y);
         y += lineHeight;
 
-        // Contact info (PNG: text only)
         ctx.fillStyle = '#007bff';
         ctx.font = 'bold 16px Arial';
         ctx.fillText(`Əlaqə: 077 711 88 99`, padding, y);
