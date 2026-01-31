@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<title>Zəmanət Axtarışı</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        padding-top: 50px;
+        background: #f0f2f5;
+    }
+    .container {
+        background: #fff;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        width: 400px;
+        text-align: center;
+    }
+    input[type="text"] {
+        width: 70%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+    }
+    button {
+        padding: 10px 18px;
+        border: none;
+        border-radius: 5px;
+        background: #007bff;
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
+        margin-bottom: 20px;
+    }
+    button:hover {
+        background: #0056b3;
+    }
+    .entry {
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 15px;
+        margin-bottom: 15px;
+        text-align: left;
+        background: #f9f9f9;
+    }
+    .entry p {
+        margin: 5px 0;
+    }
+    .entry p span {
+        font-weight: bold;
+    }
+    .contact {
+        margin-top: 10px;
+        font-weight: bold;
+        color: #007bff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .whatsapp-btn {
+        background-color: #25D366;
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    .whatsapp-btn:hover {
+        background-color: #1DA851;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h2>Zəmanət Axtarışı</h2>
+    <input type="text" id="orderInput" placeholder="Sifariş nömrəsi daxil edin">
+    <button onclick="searchOrder()">Axtar</button>
+    <div id="result"></div>
+    <button id="downloadBtn" style="display:none;" onclick="downloadPNG()">Yüklə</button>
+    <canvas id="hiddenCanvas" style="display:none;"></canvas>
+</div>
+
+<script>
+const canvas = document.getElementById('hiddenCanvas');
+const ctx = canvas.getContext('2d');
+
+async function searchOrder() {
+    const orderId = document.getElementById('orderInput').value.trim();
+    const resultDiv = document.getElementById('result');
+    const downloadBtn = document.getElementById('downloadBtn');
+    downloadBtn.style.display = 'none';
+    resultDiv.innerHTML = '';
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    if (!orderId) return alert("Zəhmət olmasa sifariş nömrəsini daxil edin.");
+
+    const url = 'https://raw.githubusercontent.com/rewaranty/rhwaranty/refs/heads/main/files/warranty.json'; // Replace with your JSON URL
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("JSON məlumatı yüklənmədi");
+        const data = await response.json();
+
+        const matches = data.filter(item => item.order_id.toString() === orderId);
+
+        if (matches.length === 0) {
+            resultDiv.innerHTML = "<p>Bu sifariş üçün zəmanət mövcud deyil.</p>";
+            return;
+        }
+
+        // Show vertical entries with contact and WhatsApp button
+        let html = '';
+        matches.forEach(item => {
+            html += `<div class="entry">
+                <p><span>Sifariş nömrəsi:</span> ${item.order_id}</p>
+                <p><span>Məhsul ID:</span> ${item.product_id}</p>
+                <p><span>Sifariş tarixi:</span> ${item.order_date}</p>
+                <p><span>Zəmanət müddəti:</span> ${item.warranty_months} ay</p>
+                <p><span>Zəmanətin bitmə tarixi:</span> ${item.warranty_end_date}</p>
+                <div class="contact">
+                    <span>Əlaqə: 077 711 88 99</span>
+                    <a href="https://wa.me/99477118899" target="_blank" class="whatsapp-btn">WhatsApp</a>
+                </div>
+            </div>`;
+        });
+        resultDiv.innerHTML = html;
+
+        // Draw PNG (hidden, without clickable WhatsApp button)
+        drawPNG(matches);
+        downloadBtn.style.display = 'inline-block';
+
+    } catch(e) {
+        resultDiv.innerHTML = "<p>Məlumatı yükləmək mümkün olmadı.</p>";
+        console.error(e);
+    }
+}
+
+function drawPNG(entries) {
+    const padding = 20;
+    const lineHeight = 28;
+    const contactHeight = 30;
+    const width = 500;
+    const height = padding*2 + entries.length * 5 * lineHeight + entries.length*contactHeight;
+
+    canvas.width = width;
+    canvas.height = height;
+
+    // Background
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0,0,width,height);
+
+    let y = padding;
+    entries.forEach(item => {
+        // Background box for each entry
+        ctx.fillStyle = '#f9f9f9';
+        ctx.fillRect(padding-5, y-5, width-padding*2+10, lineHeight*5 + contactHeight + 10);
+
+        ctx.fillStyle = '#000000';
+        ctx.font = '16px Arial';
+        ctx.fillText(`Sifariş nömrəsi: ${item.order_id}`, padding, y);
+        y += lineHeight;
+        ctx.fillText(`Məhsul ID: ${item.product_id}`, padding, y);
+        y += lineHeight;
+        ctx.fillText(`Sifariş tarixi: ${item.order_date}`, padding, y);
+        y += lineHeight;
+        ctx.fillText(`Zəmanət müddəti: ${item.warranty_months} ay`, padding, y);
+        y += lineHeight;
+        ctx.fillText(`Zəmanətin bitmə tarixi: ${item.warranty_end_date}`, padding, y);
+        y += lineHeight;
+
+        // Contact info (PNG: text only)
+        ctx.fillStyle = '#007bff';
+        ctx.font = 'bold 16px Arial';
+        ctx.fillText(`Əlaqə: 077 711 88 99`, padding, y);
+        y += contactHeight + 10;
+    });
+}
+
+function downloadPNG() {
+    const orderId = document.getElementById('orderInput').value.trim();
+    const link = document.createElement('a');
+    link.download = `${orderId}_warranty.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+}
+</script>
+</body>
+</html>
