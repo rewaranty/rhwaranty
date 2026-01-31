@@ -198,7 +198,7 @@ async function searchOrder() {
         const matches = data.filter(item => item.order_id.toString() === orderId);
 
         if (matches.length === 0) {
-            resultDiv.innerHTML = '<p class="no-result">Bu sifariş üçün zəmanət mövcud deyil. Sifarişi yeni təhvil götürmüsünüzsə - 24 saat sonra yenidən cəhd edin.</p>';
+            resultDiv.innerHTML = '<p class="no-result">Bu sifariş üçün zəmanət mövcud deyil. Sifarişi yeni təhvil götürmüsünüzsə - 1 saat sonra yenidən cəhd edin.</p>';
             return;
         }
 
@@ -318,6 +318,7 @@ function downloadPNG() {
 </script>
 </body>
 </html>
+
 
 
 
