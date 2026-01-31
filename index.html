@@ -2,81 +2,96 @@
 <html lang="az">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <title>Zəmanət Axtarışı</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-    /* Reset & box-sizing */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
 
     body {
         font-family: Arial, sans-serif;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start; /* start from top */
         min-height: 100vh;
-        padding: 10px;
         background: #f0f2f5;
+        padding: 16px;
+        -webkit-text-size-adjust: 100%; /* prevents iOS auto-zoom on inputs */
     }
 
     .container {
         background: #fff;
-        padding: 5vw; /* responsive padding */
+        padding: 24px 20px;
         border-radius: 10px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         width: 100%;
         max-width: 600px;
-        min-height: 50vh; /* minimum height for mobile */
+        margin: 0 auto;
         display: flex;
         flex-direction: column;
         align-items: center;
     }
 
     h2 {
-        font-size: clamp(18px, 4vw, 28px); /* responsive font */
-        margin-bottom: 4vw;
+        font-size: 22px;
+        margin-bottom: 20px;
         text-align: center;
     }
 
     input[type="text"] {
         width: 100%;
-        padding: 3vw;
-        margin-bottom: 4vw;
+        padding: 12px 14px;
+        margin-bottom: 14px;
         border-radius: 5px;
         border: 1px solid #ccc;
-        font-size: clamp(14px, 4vw, 18px);
+        font-size: 16px; /* 16px prevents iOS zoom on focus */
+        outline: none;
+        transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+        border-color: #007bff;
     }
 
     button {
-        padding: 3vw;
+        padding: 12px 0;
         border: none;
         border-radius: 5px;
         background: #007bff;
         color: #fff;
-        font-size: clamp(14px, 4vw, 18px);
+        font-size: 16px;
         cursor: pointer;
-        margin-bottom: 4vw;
-        width: 60%;
-        max-width: 200px;
+        margin-bottom: 16px;
+        width: 100%;
+        max-width: 220px;
+        transition: background 0.2s;
     }
 
     button:hover {
         background: #0056b3;
     }
 
+    button:active {
+        background: #004085;
+    }
+
     #result {
         width: 100%;
-        overflow-y: auto;
     }
 
     .entry {
         border: 1px solid #ddd;
         border-radius: 6px;
-        padding: 3vw;
-        margin-bottom: 4vw;
-        text-align: left;
+        padding: 14px;
+        margin-bottom: 14px;
         background: #f9f9f9;
-        word-wrap: break-word;
-        font-size: clamp(12px, 3vw, 16px);
+        word-break: break-word;
+    }
+
+    .entry p {
+        font-size: 14px;
+        margin-bottom: 6px;
+        line-height: 1.4;
     }
 
     .entry p span {
@@ -84,43 +99,73 @@
     }
 
     .contact {
-        margin-top: 2vw;
-        font-weight: bold;
-        color: #007bff;
+        margin-top: 12px;
         display: flex;
         flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
-        gap: 2vw;
-        font-size: clamp(12px, 3vw, 16px);
+        gap: 8px;
+    }
+
+    .contact-number {
+        font-weight: bold;
+        color: #007bff;
+        font-size: 14px;
     }
 
     .whatsapp-btn {
         background-color: #25D366;
         color: #fff;
-        padding: 1vw 3vw;
+        padding: 8px 16px;
         border-radius: 5px;
         text-decoration: none;
         font-weight: bold;
-        text-align: center;
-        font-size: clamp(12px, 3vw, 16px);
+        font-size: 14px;
+        display: inline-block;
+        transition: background-color 0.2s;
     }
 
     .whatsapp-btn:hover {
         background-color: #1DA851;
     }
 
-    /* Optional: adjust container on very small screens */
+    .no-result {
+        font-size: 14px;
+        color: #555;
+        text-align: center;
+        padding: 10px 0;
+    }
+
+    /* Small phones */
     @media (max-width: 400px) {
-        .container { padding: 4vw; }
-        button { width: 70%; }
+        body {
+            padding: 10px;
+        }
+        .container {
+            padding: 18px 14px;
+            border-radius: 8px;
+        }
+        h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+        .entry {
+            padding: 12px;
+        }
+        .entry p {
+            font-size: 13px;
+        }
+        .contact-number,
+        .whatsapp-btn {
+            font-size: 13px;
+        }
     }
 </style>
 </head>
 <body>
 <div class="container">
     <h2>Zəmanət Axtarışı</h2>
-    <input type="text" id="orderInput" placeholder="Sifariş nömrəsi daxil edin">
+    <input type="text" id="orderInput" placeholder="Sifariş nömrəsi daxil edin" autocomplete="off">
     <button onclick="searchOrder()">Axtar</button>
     <div id="result"></div>
     <button id="downloadBtn" style="display:none;" onclick="downloadPNG()">Yüklə</button>
@@ -137,9 +182,11 @@ async function searchOrder() {
     const downloadBtn = document.getElementById('downloadBtn');
     downloadBtn.style.display = 'none';
     resultDiv.innerHTML = '';
-    ctx.clearRect(0,0,canvas.width,canvas.height);
 
-    if (!orderId) return alert("Zəhmət olmasa sifariş nömrəsini daxil edin.");
+    if (!orderId) {
+        alert("Zəhmət olmasa sifariş nömrəsini daxil edin.");
+        return;
+    }
 
     const url = 'https://raw.githubusercontent.com/rewaranty/rhwaranty/refs/heads/main/files/warranty.json';
 
@@ -151,7 +198,7 @@ async function searchOrder() {
         const matches = data.filter(item => item.order_id.toString() === orderId);
 
         if (matches.length === 0) {
-            resultDiv.innerHTML = "<p>Bu sifariş üçün zəmanət mövcud deyil.</p>";
+            resultDiv.innerHTML = '<p class="no-result">Bu sifariş üçün zəmanət mövcud deyil.</p>';
             return;
         }
 
@@ -164,7 +211,7 @@ async function searchOrder() {
                 <p><span>Zəmanət müddəti:</span> ${item.warranty_months} ay</p>
                 <p><span>Zəmanətin bitmə tarixi:</span> ${item.warranty_end_date}</p>
                 <div class="contact">
-                    <span>Əlaqə: 077 711 88 99</span>
+                    <span class="contact-number">Əlaqə: 077 711 88 99</span>
                     <a href="https://wa.me/99477118899" target="_blank" class="whatsapp-btn">WhatsApp</a>
                 </div>
             </div>`;
@@ -174,54 +221,91 @@ async function searchOrder() {
         drawPNG(matches);
         downloadBtn.style.display = 'inline-block';
 
-    } catch(e) {
-        resultDiv.innerHTML = "<p>Məlumatı yükləmək mümkün olmadı.</p>";
+    } catch (e) {
+        resultDiv.innerHTML = '<p class="no-result">Məlumatı yükləmək mümkün olmadı.</p>';
         console.error(e);
     }
 }
 
 function drawPNG(entries) {
+    const dpr = window.devicePixelRatio || 1; // retina / high-DPI support
     const padding = 20;
-    const lineHeight = 24;
-    const contactHeight = 30;
+    const lineHeight = 26;
+    const entryCount = entries.length;
+    const linesPerEntry = 5;
+    const contactGap = 34;
+    const entrySpacing = 16;
 
-    // Responsive canvas width
-    const container = document.querySelector('.container');
-    const width = container.clientWidth;
-    const height = padding*2 + entries.length * 5 * lineHeight + entries.length*contactHeight;
+    const cssWidth = Math.min(document.querySelector('.container').clientWidth, 600);
+    const cssHeight =
+        padding * 2 +
+        entryCount * (linesPerEntry * lineHeight + contactGap + entrySpacing);
 
-    canvas.width = width;
-    canvas.height = height;
+    // Set canvas pixel size (sharp on retina)
+    canvas.width = cssWidth * dpr;
+    canvas.height = cssHeight * dpr;
 
-    const fontSize = Math.floor(width / 30);
-    const contactFontSize = Math.floor(width / 30);
+    // Scale context so we can draw in CSS pixels
+    ctx.scale(dpr, dpr);
 
+    const fontSize = 15;
+    const boldFontSize = 15;
+
+    // White background
     ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0,0,width,height);
+    ctx.fillRect(0, 0, cssWidth, cssHeight);
 
     let y = padding;
-    entries.forEach(item => {
+
+    entries.forEach((item, index) => {
+        const blockHeight = linesPerEntry * lineHeight + contactGap;
+
+        // Card background
         ctx.fillStyle = '#f9f9f9';
-        ctx.fillRect(padding-5, y-5, width-padding*2+10, lineHeight*5 + contactHeight + 10);
+        ctx.beginPath();
+        ctx.roundRect(padding - 4, y - 6, cssWidth - padding * 2 + 8, blockHeight + 6, 6);
+        ctx.fill();
 
-        ctx.fillStyle = '#000000';
-        ctx.font = `${fontSize}px Arial`;
-        ctx.fillText(`Sifariş nömrəsi: ${item.order_id}`, padding, y);
-        y += lineHeight;
-        ctx.fillText(`Məhsul ID: ${item.product_id}`, padding, y);
-        y += lineHeight;
-        ctx.fillText(`Sifariş tarixi: ${item.order_date}`, padding, y);
-        y += lineHeight;
-        ctx.fillText(`Zəmanət müddəti: ${item.warranty_months} ay`, padding, y);
-        y += lineHeight;
-        ctx.fillText(`Zəmanətin bitmə tarixi: ${item.warranty_end_date}`, padding, y);
-        y += lineHeight;
+        // Border
+        ctx.strokeStyle = '#ddd';
+        ctx.lineWidth = 1;
+        ctx.stroke();
 
+        let textY = y + 16; // offset from top of card
+
+        // Labels (bold) + values (normal)
+        const lines = [
+            { label: 'Sifariş nömrəsi:', value: `${item.order_id}` },
+            { label: 'Məhsul ID:',       value: `${item.product_id}` },
+            { label: 'Sifariş tarixi:',   value: `${item.order_date}` },
+            { label: 'Zəmanət müddəti:',  value: `${item.warranty_months} ay` },
+            { label: 'Zəmanətin bitmə tarixi:', value: `${item.warranty_end_date}` }
+        ];
+
+        lines.forEach(line => {
+            // Bold label
+            ctx.fillStyle = '#000';
+            ctx.font = `bold ${boldFontSize}px Arial`;
+            ctx.fillText(line.label, padding + 10, textY);
+            const labelWidth = ctx.measureText(line.label).width;
+
+            // Normal value
+            ctx.font = `${fontSize}px Arial`;
+            ctx.fillText(line.value, padding + 10 + labelWidth + 6, textY);
+
+            textY += lineHeight;
+        });
+
+        // Contact line
         ctx.fillStyle = '#007bff';
-        ctx.font = `bold ${contactFontSize}px Arial`;
-        ctx.fillText(`Əlaqə: 077 711 88 99`, padding, y);
-        y += contactHeight + 10;
+        ctx.font = `bold ${boldFontSize}px Arial`;
+        ctx.fillText('Əlaqə: 077 711 88 99', padding + 10, textY);
+
+        y += blockHeight + entrySpacing;
     });
+
+    // Reset scale so it doesn't stack on next call
+    ctx.scale(1 / dpr, 1 / dpr);
 }
 
 function downloadPNG() {
