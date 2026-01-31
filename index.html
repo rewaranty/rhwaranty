@@ -3,99 +3,117 @@
 <head>
 <meta charset="UTF-8">
 <title>Zəmanət Axtarışı</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
+    /* Reset & box-sizing */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
         font-family: Arial, sans-serif;
         display: flex;
         justify-content: center;
-        padding: 20px;
+        align-items: flex-start; /* start from top */
+        min-height: 100vh;
+        padding: 10px;
         background: #f0f2f5;
-        box-sizing: border-box;
     }
+
     .container {
         background: #fff;
-        padding: 20px;
+        padding: 5vw; /* responsive padding */
         border-radius: 10px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         width: 100%;
         max-width: 600px;
+        min-height: 50vh; /* minimum height for mobile */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    h2 {
+        font-size: clamp(18px, 4vw, 28px); /* responsive font */
+        margin-bottom: 4vw;
         text-align: center;
     }
+
     input[type="text"] {
-        width: 90%;
-        max-width: 500px;
-        padding: 10px;
-        margin-bottom: 15px;
+        width: 100%;
+        padding: 3vw;
+        margin-bottom: 4vw;
         border-radius: 5px;
         border: 1px solid #ccc;
-        font-size: 16px;
-        box-sizing: border-box;
+        font-size: clamp(14px, 4vw, 18px);
     }
+
     button {
-        padding: 10px 18px;
+        padding: 3vw;
         border: none;
         border-radius: 5px;
         background: #007bff;
         color: #fff;
-        font-size: 16px;
+        font-size: clamp(14px, 4vw, 18px);
         cursor: pointer;
-        margin-bottom: 20px;
-        width: 90%;
+        margin-bottom: 4vw;
+        width: 60%;
         max-width: 200px;
     }
+
     button:hover {
         background: #0056b3;
     }
+
+    #result {
+        width: 100%;
+        overflow-y: auto;
+    }
+
     .entry {
         border: 1px solid #ddd;
         border-radius: 6px;
-        padding: 15px;
-        margin-bottom: 15px;
+        padding: 3vw;
+        margin-bottom: 4vw;
         text-align: left;
         background: #f9f9f9;
         word-wrap: break-word;
+        font-size: clamp(12px, 3vw, 16px);
     }
-    .entry p {
-        margin: 5px 0;
-    }
+
     .entry p span {
         font-weight: bold;
     }
+
     .contact {
-        margin-top: 10px;
+        margin-top: 2vw;
         font-weight: bold;
         color: #007bff;
         display: flex;
         flex-wrap: wrap;
         align-items: center;
         justify-content: space-between;
-        gap: 10px;
+        gap: 2vw;
+        font-size: clamp(12px, 3vw, 16px);
     }
+
     .whatsapp-btn {
         background-color: #25D366;
         color: #fff;
-        padding: 5px 10px;
+        padding: 1vw 3vw;
         border-radius: 5px;
         text-decoration: none;
         font-weight: bold;
-        font-size: 14px;
         text-align: center;
+        font-size: clamp(12px, 3vw, 16px);
     }
+
     .whatsapp-btn:hover {
         background-color: #1DA851;
     }
 
-    @media (max-width: 600px) {
-        .container {
-            padding: 15px;
-        }
-        input[type="text"], button {
-            width: 100%;
-        }
-        .contact {
-            flex-direction: column;
-            align-items: flex-start;
-        }
+    /* Optional: adjust container on very small screens */
+    @media (max-width: 400px) {
+        .container { padding: 4vw; }
+        button { width: 70%; }
     }
 </style>
 </head>
@@ -163,20 +181,19 @@ async function searchOrder() {
 }
 
 function drawPNG(entries) {
-    // Make canvas width responsive to device
     const padding = 20;
     const lineHeight = 24;
     const contactHeight = 30;
-    const maxCanvasWidth = 600; // Max width for large screens
-    const containerWidth = Math.min(window.innerWidth - 40, maxCanvasWidth); // 40 = body padding
-    const width = containerWidth;
+
+    // Responsive canvas width
+    const container = document.querySelector('.container');
+    const width = container.clientWidth;
     const height = padding*2 + entries.length * 5 * lineHeight + entries.length*contactHeight;
 
     canvas.width = width;
     canvas.height = height;
 
-    // Scale font based on width
-    const fontSize = Math.floor(width / 30); // roughly scales with width
+    const fontSize = Math.floor(width / 30);
     const contactFontSize = Math.floor(width / 30);
 
     ctx.fillStyle = '#ffffff';
@@ -214,12 +231,6 @@ function downloadPNG() {
     link.href = canvas.toDataURL('image/png');
     link.click();
 }
-
-// Optional: redraw PNG if window is resized
-window.addEventListener('resize', () => {
-    const orderId = document.getElementById('orderInput').value.trim();
-    if(orderId) searchOrder();
-});
 </script>
 </body>
 </html>
