@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-<title>Zəmanət Axtarışı</title>
+<title>Axtarış</title>
 <style>
     * {
         box-sizing: border-box;
@@ -164,7 +164,7 @@
 </head>
 <body>
 <div class="container">
-    <h2>Zəmanət Axtarışı</h2>
+    <h2></h2>
     <input type="text" id="orderInput" placeholder="Sifariş nömrəsi daxil edin" autocomplete="off">
     <button onclick="searchOrder()">Axtar</button>
     <div id="result"></div>
@@ -198,7 +198,7 @@ async function searchOrder() {
         const matches = data.filter(item => item.order_id.toString() === orderId);
 
         if (matches.length === 0) {
-            resultDiv.innerHTML = '<p class="no-result">Bu sifariş üçün zəmanət mövcud deyil.</p>';
+            resultDiv.innerHTML = '<p class="no-result">Bu sifariş üçün zəmanət mövcud deyil.</br>Sifarişi yeni təhvil götürmüsünüzsə - 24 saat sonra yenidən cəhd edin.</p>';
             return;
         }
 
@@ -318,4 +318,5 @@ function downloadPNG() {
 </script>
 </body>
 </html>
+
 
