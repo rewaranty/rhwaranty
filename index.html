@@ -18,12 +18,12 @@
         border-radius: 10px;
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
         width: 100%;
-        max-width: 500px;
+        max-width: 600px;
         text-align: center;
     }
     input[type="text"] {
         width: 90%;
-        max-width: 400px;
+        max-width: 500px;
         padding: 10px;
         margin-bottom: 15px;
         border-radius: 5px;
@@ -85,7 +85,6 @@
         background-color: #1DA851;
     }
 
-    /* Responsive adjustments */
     @media (max-width: 600px) {
         .container {
             padding: 15px;
@@ -164,14 +163,21 @@ async function searchOrder() {
 }
 
 function drawPNG(entries) {
+    // Make canvas width responsive to device
     const padding = 20;
-    const lineHeight = 28;
+    const lineHeight = 24;
     const contactHeight = 30;
-    const width = 500;
+    const maxCanvasWidth = 600; // Max width for large screens
+    const containerWidth = Math.min(window.innerWidth - 40, maxCanvasWidth); // 40 = body padding
+    const width = containerWidth;
     const height = padding*2 + entries.length * 5 * lineHeight + entries.length*contactHeight;
 
     canvas.width = width;
     canvas.height = height;
+
+    // Scale font based on width
+    const fontSize = Math.floor(width / 30); // roughly scales with width
+    const contactFontSize = Math.floor(width / 30);
 
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0,0,width,height);
@@ -182,7 +188,7 @@ function drawPNG(entries) {
         ctx.fillRect(padding-5, y-5, width-padding*2+10, lineHeight*5 + contactHeight + 10);
 
         ctx.fillStyle = '#000000';
-        ctx.font = '16px Arial';
+        ctx.font = `${fontSize}px Arial`;
         ctx.fillText(`Sifariş nömrəsi: ${item.order_id}`, padding, y);
         y += lineHeight;
         ctx.fillText(`Məhsul ID: ${item.product_id}`, padding, y);
@@ -195,7 +201,7 @@ function drawPNG(entries) {
         y += lineHeight;
 
         ctx.fillStyle = '#007bff';
-        ctx.font = 'bold 16px Arial';
+        ctx.font = `bold ${contactFontSize}px Arial`;
         ctx.fillText(`Əlaqə: 077 711 88 99`, padding, y);
         y += contactHeight + 10;
     });
@@ -208,6 +214,12 @@ function downloadPNG() {
     link.href = canvas.toDataURL('image/png');
     link.click();
 }
+
+// Optional: redraw PNG if window is resized
+window.addEventListener('resize', () => {
+    const orderId = document.getElementById('orderInput').value.trim();
+    if(orderId) searchOrder();
+});
 </script>
 </body>
 </html>
