@@ -98,6 +98,36 @@
         font-weight: bold;
     }
 
+    .warranty-terms {
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 2px solid #ddd;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    .warranty-terms h3 {
+        font-size: 14px;
+        margin-top: 12px;
+        margin-bottom: 6px;
+        color: #333;
+    }
+
+    .warranty-terms ul {
+        margin-left: 20px;
+        margin-bottom: 8px;
+    }
+
+    .warranty-terms li {
+        margin-bottom: 4px;
+    }
+
+    .warranty-terms .important {
+        margin-top: 12px;
+        font-weight: bold;
+        color: #d9534f;
+    }
+
     .contact {
         margin-top: 12px;
         display: flex;
@@ -159,8 +189,15 @@
         .whatsapp-btn {
             font-size: 13px;
         }
+        .warranty-terms {
+            font-size: 12px;
+        }
+        .warranty-terms h3 {
+            font-size: 13px;
+        }
     }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 <div class="container">
@@ -169,12 +206,21 @@
     <button onclick="searchOrder()">Axtar</button>
     <div id="result"></div>
     <button id="downloadBtn" style="display:none;" onclick="downloadPNG()">Yüklə</button>
-    <canvas id="hiddenCanvas" style="display:none;"></canvas>
 </div>
-
 <script>
-const canvas = document.getElementById('hiddenCanvas');
-const ctx = canvas.getContext('2d');
+function formatDate(dateString) {
+    // Convert YYYYMMDD to DD.MM.YYYY
+    if (!dateString) return dateString;
+    
+    const str = dateString.toString();
+    if (str.length === 8) {
+        const year = str.substring(0, 4);
+        const month = str.substring(4, 6);
+        const day = str.substring(6, 8);
+        return `${day}.${month}.${year}`;
+    }
+    return dateString;
+}
 
 async function searchOrder() {
     const orderId = document.getElementById('orderInput').value.trim();
@@ -204,21 +250,64 @@ async function searchOrder() {
 
         let html = '';
         matches.forEach(item => {
+            const formattedOrderDate = formatDate(item.order_date);
+            const formattedEndDate = formatDate(item.warranty_end_date);
+            
             html += `<div class="entry">
                 <p><span>Sifariş nömrəsi:</span> ${item.order_id}</p>
-                <p><span>Məhsul ID:</span> ${item.product_id}</p>
-                <p><span>Sifariş tarixi:</span> ${item.order_date}</p>
+                <p><span>Sifariş tarixi:</span> ${formattedOrderDate}</p>
                 <p><span>Zəmanət müddəti:</span> ${item.warranty_months} ay</p>
-                <p><span>Zəmanətin bitmə tarixi:</span> ${item.warranty_end_date}</p>
+                <p><span>Zəmanətin bitmə tarixi:</span> ${formattedEndDate}</p>
+                
+                <div class="warranty-terms">
+                    <h3>1. Zəmanətin əhatə dairəsi</h3>
+                    <p>Bu zəmanət talonu, yuxarıda göstərilən məhsul üçün istehsalçı qüsurlarına qarşı zəmanəti təsdiq edir. Zəmanət müddəti sifariş tarixindən etibarən qüvvəyə minir.</p>
+                    <p>Zəmanət aşağıdakı halları əhatə edir:</p>
+                    <ul>
+                        <li>İstehsal qüsurları</li>
+                        <li>Normal istifadə zamanı yaranan texniki nasazlıqlar</li>
+                    </ul>
+                    
+                    <h3>2. Zəmanətə daxil olmayan hallar</h3>
+                    <p>Aşağıdakı hallar zəmanətə daxil deyil:</p>
+                    <ul>
+                        <li>İstifadəçi səhvi, zərbə, düşmə, maye ilə təmas</li>
+                        <li>Elektrik gərginliyi, uyğun olmayan adapter və ya aksesuar istifadəsi</li>
+                        <li>Proqram təminatına istifadəçi müdaxiləsi (jailbreak, root, qeyri-rəsmi proqramlar)</li>
+                        <li>Mexaniki zədələr, çatlar, ekran qırılması</li>
+                        <li>Seriya nömrəsinin dəyişdirilməsi və ya oxunmaz vəziyyətə salınması</li>
+                    </ul>
+                    
+                    <h3>3. Daşınma ilə bağlı şərtlər</h3>
+                    <p>Məhsulun müştəriyə çatdırılması Birmarket tərəfindən həyata keçirilir. Daşınma zamanı baş verə biləcək gecikmələr, zədələnmələr və ya itkilərə görə mağazamız birbaşa məsuliyyət daşımır.</p>
+                    
+                    <h3>4. Zəmanət xidməti</h3>
+                    <p>Zəmanət xidməti yalnız:</p>
+                    <ul>
+                        <li>Bu zəmanət talonu təqdim edildikdə</li>
+                        <li>Məhsulun orijinal komplektasiyası saxlanıldıqda göstərilir.</li>
+                    </ul>
+                    <p>Zəmanət müddətində təmir və ya dəyişdirmə qərarı texniki baxışdan sonra verilir.</p>
+                    
+                    <h3>5. Digər şərtlər</h3>
+                    <ul>
+                        <li>Təmir müddətində əvəzedici məhsul təqdim olunmaya bilər.</li>
+                        <li>Zəmanət yalnız Azərbaycan Respublikası ərazisində keçərlidir.</li>
+                    </ul>
+                    
+                    <p class="important">Vacib:<br>
+                    Məhsul təhvil alınarkən qablaşdırma və məhsul mütləq yoxlanılmalı, hər hansı zədə aşkar edildikdə dərhal daşıyıcı şirkətə bildirilməlidir.</p>
+                </div>
+                
                 <div class="contact">
-                    <span class="contact-number">Əlaqə: 077 711 88 99</span>
+                    <span class="contact-number">
+					  Əlaqə: <a href="tel:+994777118899">077 711 88 99</a>
+					</span>
                     <a href="https://wa.me/99477118899" target="_blank" class="whatsapp-btn">WhatsApp</a>
                 </div>
             </div>`;
         });
         resultDiv.innerHTML = html;
-
-        drawPNG(matches);
         downloadBtn.style.display = 'inline-block';
 
     } catch (e) {
@@ -227,98 +316,25 @@ async function searchOrder() {
     }
 }
 
-function drawPNG(entries) {
-    const dpr = window.devicePixelRatio || 1; // retina / high-DPI support
-    const padding = 20;
-    const lineHeight = 26;
-    const entryCount = entries.length;
-    const linesPerEntry = 5;
-    const contactGap = 34;
-    const entrySpacing = 16;
-
-    const cssWidth = Math.min(document.querySelector('.container').clientWidth, 600);
-    const cssHeight =
-        padding * 2 +
-        entryCount * (linesPerEntry * lineHeight + contactGap + entrySpacing);
-
-    // Set canvas pixel size (sharp on retina)
-    canvas.width = cssWidth * dpr;
-    canvas.height = cssHeight * dpr;
-
-    // Scale context so we can draw in CSS pixels
-    ctx.scale(dpr, dpr);
-
-    const fontSize = 15;
-    const boldFontSize = 15;
-
-    // White background
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, cssWidth, cssHeight);
-
-    let y = padding;
-
-    entries.forEach((item, index) => {
-        const blockHeight = linesPerEntry * lineHeight + contactGap;
-
-        // Card background
-        ctx.fillStyle = '#f9f9f9';
-        ctx.beginPath();
-        ctx.roundRect(padding - 4, y - 6, cssWidth - padding * 2 + 8, blockHeight + 6, 6);
-        ctx.fill();
-
-        // Border
-        ctx.strokeStyle = '#ddd';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-
-        let textY = y + 16; // offset from top of card
-
-        // Labels (bold) + values (normal)
-        const lines = [
-            { label: 'Sifariş nömrəsi:', value: `${item.order_id}` },
-            { label: 'Məhsul ID:',       value: `${item.product_id}` },
-            { label: 'Sifariş tarixi:',   value: `${item.order_date}` },
-            { label: 'Zəmanət müddəti:',  value: `${item.warranty_months} ay` },
-            { label: 'Zəmanətin bitmə tarixi:', value: `${item.warranty_end_date}` }
-        ];
-
-        lines.forEach(line => {
-            // Bold label
-            ctx.fillStyle = '#000';
-            ctx.font = `bold ${boldFontSize}px Arial`;
-            ctx.fillText(line.label, padding + 10, textY);
-            const labelWidth = ctx.measureText(line.label).width;
-
-            // Normal value
-            ctx.font = `${fontSize}px Arial`;
-            ctx.fillText(line.value, padding + 10 + labelWidth + 6, textY);
-
-            textY += lineHeight;
-        });
-
-        // Contact line
-        ctx.fillStyle = '#007bff';
-        ctx.font = `bold ${boldFontSize}px Arial`;
-        ctx.fillText('Əlaqə: 077 711 88 99', padding + 10, textY);
-
-        y += blockHeight + entrySpacing;
-    });
-
-    // Reset scale so it doesn't stack on next call
-    ctx.scale(1 / dpr, 1 / dpr);
-}
 
 function downloadPNG() {
     const orderId = document.getElementById('orderInput').value.trim();
-    const link = document.createElement('a');
-    link.download = `${orderId}_warranty.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
+    const div = document.getElementById('result');
+
+    // Use html2canvas to convert div to canvas
+    html2canvas(div).then(canvas => {
+        const imgData = canvas.toDataURL("image/png");
+
+        // Create a temporary link to download PNG
+        const link = document.createElement("a");
+        link.href = imgData;
+        link.download = `${orderId}_warranty.png`; // same naming convention
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    });
 }
+
 </script>
 </body>
 </html>
-
-
-
-
